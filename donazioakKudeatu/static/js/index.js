@@ -1,20 +1,64 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Simular datos de progreso (en un caso real esto vendría del backend)
-    const goalAmount = 12000;
-    let currentAmount = 4500; // Esto normalmente vendría de la base de datos o de RedSys
-    
-    // Actualizar la barra de progreso
-    updateProgressBar(currentAmount, goalAmount);
-    
-    // Manejar el envío del formulario
+    // Elementos del DOM
     const donationForm = document.getElementById('donationForm');
     const resultModal = document.getElementById('resultModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalMessage = document.getElementById('modalMessage');
     const modalBtn = document.getElementById('modalBtn');
     
+    // Función para obtener el token CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Cargar progreso inicial
+    fetchProgress();
+
+    // Actualizar cada 30 segundos
+    setInterval(fetchProgress, 30000);
+
+    // Obtener datos del progreso desde Django
+    function fetchProgress() {
+        fetch('/campaign-progress/')
+            .then(response => {
+                if (!response.ok) throw new Error('Error en la red');
+                return response.json();
+            })
+            .then(data => {
+                updateProgressBar(data.current_amount, data.goal_amount);
+            })
+            .catch(error => {
+                console.error('Error al cargar el progreso:', error);
+                alert('Oraintxe ezin da ikusi zenbait diru donatu den');
+            });
+    }
+
+    // Función para actualizar la barra de progreso
+    function updateProgressBar(current, goal) {
+        const percentage = Math.min((current / goal) * 100, 100);
+        const progressFill = document.getElementById('progressFill');
+        const currentAmountElement = document.getElementById('currentAmount');
+        const goalAmountElement = document.getElementById('goalAmount');
+        
+        progressFill.style.width = `${percentage}%`;
+        progressFill.textContent = `${Math.round(percentage)}%`;
+        currentAmountElement.textContent = current.toLocaleString('es-ES');
+        goalAmountElement.textContent = goal.toLocaleString('es-ES');
+    }
+
     // Al pulsar el botón de donar
-    document.getElementById('donationForm').addEventListener('submit', function(e) {
+    donationForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const amount = parseFloat(document.getElementById('amount').value);
         
@@ -29,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if(data.redirect_url) {
-                // Redirigir al TPV Virtual de Redsys
                 window.location.href = data.redirect_url;
             }
         })
@@ -38,20 +81,9 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Errorea ordainketa prozesuan');
         });
     });
-    
+
     // Cerrar el modal
     modalBtn.addEventListener('click', function() {
         resultModal.style.display = 'none';
     });
-    
-    // Función para actualizar la barra de progreso
-    function updateProgressBar(current, goal) {
-        const percentage = Math.min((current / goal) * 100, 100);
-        const progressFill = document.getElementById('progressFill');
-        const currentAmountElement = document.getElementById('currentAmount');
-        
-        progressFill.style.width = `${percentage}%`;
-        progressFill.textContent = `${Math.round(percentage)}%`;
-        currentAmountElement.textContent = current.toLocaleString();
-    }
 });

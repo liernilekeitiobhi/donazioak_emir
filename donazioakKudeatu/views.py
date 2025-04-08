@@ -1,6 +1,21 @@
 # Create your views here.
+'''
+sequenceDiagram
+    participant Usuario
+    participant TuServidor
+    participant Redsys
 
-from django.shortcuts import render
+    Usuario->>TuServidor: 1. Inicia pago (POST /donate/)
+    TuServidor->>Redsys: 2. Redirección con formulario
+    Redsys->>Usuario: 3. Interfaz de pago
+    Usuario->>Redsys: 4. Completa pago
+    Redsys->>TuServidor: 5. Notificación POST (actualiza BD)
+    TuServidor->>Redsys: 6. Responde "OK"
+    Redsys->>Usuario: 7. Redirección GET (/success/ o /error/)
+
+'''
+
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import json
 import base64
@@ -15,14 +30,22 @@ from models import *
 import uuid
 from django.utils import timezone
 
+
 logger = logging.getLogger(__name__)
 
 
 #============================================
 # Solo muestra la página con el formulario
 #============================================
-def formularioa_erakutsi(request):    
-    return render(request, 'donazioakKudeatu/index.html')
+def formularioa_erakutsi(request):
+    # Obtén la campaña activa (puedes ajustar esto según tu lógica)
+    campaign = get_object_or_404(Campaign, is_active=True)
+    
+    context = {
+        'campaign': campaign,
+        'progress_percentage': campaign.progress_percentage(),
+    }
+    return render(request, 'donazioakKudeatu/index.html', context)
 
 
 
@@ -149,11 +172,53 @@ def erantzuna_jaso_Redsysetik(request):
 # ==========================================================
 
 def ordainketa_zuzena(request):
-    return render(request, 'donazioakKudeatu/ordainketa-zuzena.html')
+    """Muestra pantalla de éxito con verificación de estado"""
+    order_id = request.GET.get('Ds_Order')
+    try:
+        donation = Donation.objects.get(transaction_id=order_id)
+        if donation.status != 'completed':
+            logger.warning(f"Acceso a éxito pero estado es {donation.status}")
+            return redirect('ordainketa_okerra')
+            
+        return render(request, 'donazioakKudeatu/ordainketa-zuzena.html', {
+            'donation': donation,
+            'payment_date': donation.processed_at.strftime("%d/%m/%Y %H:%M") if donation.processed_at else ""
+        })
+    except Donation.DoesNotExist:
+        logger.error(f"Donación no encontrada para order_id: {order_id}")
+        return redirect('formularioa_erakutsi')
+
 
 # ==========================================================
 # Si el pago ha sido erroneo mostraremos una pantalla roja
 # ==========================================================
 
 def ordainketa_okerra(request):
-    return render(request, 'donazioakKudeatu/errorea-ordainketan.html')
+    """Muestra pantalla de error con detalles"""
+    error_code = request.GET.get('Ds_Response')
+    order_id = request.GET.get('Ds_Order')
+    context = {
+        'error_code': error_code,
+        'error_message': get_error_message(error_code) if error_code else 'Errore ezezaguna'
+    }
+    
+    if order_id:
+        try:
+            donation = Donation.objects.get(transaction_id=order_id)
+            context['donation'] = donation
+        except Donation.DoesNotExist:
+            logger.warning(f"Orden no encontrada en error: {order_id}")
+    
+    return render(request, 'donazioakKudeatu/errorea-ordainketan.html', context)
+
+# =======================================================
+# Para la barra de progreso
+# =======================================================
+
+def get_progress_data(request):
+    return JsonResponse({
+        'total_raised': float(Donation.get_total_raised()),
+        'progress_percentage': Donation.get_progress_percentage(),
+        'campaign_goal': settings.CAMPAIGN_GOAL
+    })
+    

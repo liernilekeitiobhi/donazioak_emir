@@ -148,6 +148,7 @@ LOGGING = {
 
 # Datos para Redsys
 
+CAMPAIGN_GOAL = 12000
 REDSYS_MERCHANT_CODE = 'tu_codigo_comercio'
 REDSYS_SECRET_KEY = config('SECRET_KEY')
 REDSYS_TERMINAL = '1'
