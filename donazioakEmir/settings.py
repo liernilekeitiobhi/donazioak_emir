@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -127,10 +128,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Datos para Redsys
 
 REDSYS_MERCHANT_CODE = 'tu_codigo_comercio'
-REDSYS_SECRET_KEY = 'tu_clave_secreta'
+REDSYS_SECRET_KEY = config('SECRET_KEY')
 REDSYS_TERMINAL = '1'
 REDSYS_CURRENCY = '978'  # EUR
 REDSYS_TRANSACTION_TYPE = '0'  # Autorización
 REDSYS_URL = 'https://sis.redsys.es/sis/realizarPago'
 REDSYS_URL_TEST = 'https://sis-t.redsys.es:25443/sis/realizarPago'
 REDSYS_MERCHANT_URL = 'https://tudominio.com/notificacion-pago/'
+DEBUG = config('DEBUG', cast=bool)
