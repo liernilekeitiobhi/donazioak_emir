@@ -13,53 +13,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalMessage = document.getElementById('modalMessage');
     const modalBtn = document.getElementById('modalBtn');
     
-    donationForm.addEventListener('submit', function(e) {
-        e.preventDefault();       
+    // Al pulsar el botón de donar
+    document.getElementById('donationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const amount = parseFloat(document.getElementById('amount').value);
         
-        
-        document.getElementById('enviar-btn').addEventListener('click', function() {
-            let amount = parseFloat(document.getElementById('amount').value);            
-            fetch('/donate/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': '{{ csrf_token }}'  //Django necesita esto para POST
-                },
-                body: `amount=${amount}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('respuesta').textContent = data.mensaje || data.error;
-            });
-        });
-        
-        // Simular envío a RedSys (en un caso real sería una petición AJAX)
-        setTimeout(() => {
-            // Simular respuesta aleatoria de RedSys (éxito o error)
-            const isSuccess = Math.random() > 0.2; // 80% de probabilidad de éxito
-            
-            if (isSuccess) {
-                // Éxito en el pago
-                modalTitle.textContent = '¡Donación exitosa!';
-                modalMessage.textContent = `Gracias por tu donación de ${amount}€. Tu contribución nos ayuda a seguir con nuestra labor.`;
-                modalMessage.className = 'modal-message success';
-                
-                // Actualizar el progreso (en un caso real esto vendría del backend)
-                currentAmount += amount;
-                updateProgressBar(currentAmount, goalAmount);
-            } else {
-                // Error en el pago
-                modalTitle.textContent = 'Error en el pago';
-                modalMessage.textContent = 'Hubo un problema al procesar tu donación. Por favor, intenta nuevamente o usa otro método de pago.';
-                modalMessage.className = 'modal-message error';
+        fetch('/donate/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: `amount=${amount}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.redirect_url) {
+                // Redirigir al TPV Virtual de Redsys
+                window.location.href = data.redirect_url;
             }
-            
-            // Mostrar el modal
-            resultModal.style.display = 'flex';
-            
-            // Resetear el formulario
-            donationForm.reset();
-        }, 1500);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Errorea ordainketa prozesuan');
+        });
     });
     
     // Cerrar el modal
