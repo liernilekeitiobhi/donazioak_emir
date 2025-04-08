@@ -2,7 +2,8 @@
 
 from django.db import models
 from django.core.validators import MinValueValidator
-import time
+from django.utils import timezone
+import uuid
 
 class Donation(models.Model):
     STATUS_CHOICES = [
