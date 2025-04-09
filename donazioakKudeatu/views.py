@@ -55,8 +55,16 @@ def formularioa_erakutsi(request):
 def donazioa_bidali_Redsysera(request):
     if request.method == 'POST':
         amount = request.POST.get('amount')
-        if not amount or float(amount) <= 0:
-            return HttpResponse("Cantidad inválida", status=400)
+        try:
+            amount = float(amount)
+        except (TypeError, ValueError):
+            amount = 0
+
+        if amount <= 0:
+            return render(request, 'donazioakKudeatu/index.html', {
+                'progress_percentage': Donation.get_progress_percentage(),
+                'error_message': "Por favor, introduce una cantidad válida mayor a 0."
+            })
         
         order_id = f"DON-{timezone.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
         
@@ -182,7 +190,6 @@ def ordainketa_zuzena(request):
             
         return render(request, 'donazioakKudeatu/ordainketa-zuzena.html', {
             'donation': donation,
-            'payment_date': donation.processed_at.strftime("%d/%m/%Y %H:%M") if donation.processed_at else ""
         })
     except Donation.DoesNotExist:
         logger.error(f"Donación no encontrada para order_id: {order_id}")

@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
-                updateProgressBar(data.current_amount, data.goal_amount);
+                updateProgressBar(data.total_raised, data.campaign_goal);
             })
             .catch(error => {
                 console.error('Error al cargar el progreso:', error);
@@ -57,33 +57,12 @@ document.addEventListener('DOMContentLoaded', function() {
         goalAmountElement.textContent = goal.toLocaleString('es-ES');
     }
 
-    // Al pulsar el botón de donar
-    donationForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const amount = parseFloat(document.getElementById('amount').value);
-        
-        fetch('/donate/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: `amount=${amount}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.redirect_url) {
-                window.location.href = data.redirect_url;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Errorea ordainketa prozesuan');
-        });
-    });
-
-    // Cerrar el modal
-    modalBtn.addEventListener('click', function() {
-        resultModal.style.display = 'none';
+    // Valida el formulario antes de enviar
+    document.getElementById('donationForm').addEventListener('submit', (e) => {
+        const amount = parseFloat(e.target.amount.value);
+        if (amount < 1) {
+            e.preventDefault();
+            alert('La cantidad mínima es 1€');
+        }
     });
 });

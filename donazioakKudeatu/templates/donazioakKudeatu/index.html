@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donazioak - Haz tu donación</title>
-    <style src="../../static/css/index.scss"></style>
-</head>
+    <link rel="preload" href="../../static/css/index.css" as="style">
+    <link rel="stylesheet" href="../../static/css/index.css"></head>
 <body>
     <header>
         <img src="https://source.unsplash.com/random/1600x900/?charity,help" alt="Imagen de cabecera" class="header-image">
@@ -23,12 +23,16 @@
 
         <section class="donation-form-container">
             <h2 class="form-title">Realiza tu donación</h2>
-            <form id="donationForm" class="donation-form">
+            <form id="donationForm" class="donation-form" method="POST" action="/donate/">
+                {% csrf_token %}
                 <div class="form-group">
                     <label for="amount">Cantidad (€)</label>
                     <input type="number" id="amount" name="amount" min="1" step="1" placeholder="Ej: 20" required>
                 </div>
                 <button type="submit" class="submit-btn">Donar ahora</button>
+                {% if error_message %}
+                    <div class="error-message">{{ error_message }}</div>
+                {% endif %}
             </form>
         </section>
 
@@ -43,14 +47,14 @@
             </p>
         </section>
     </div>
-
+    <!--
     <div id="resultModal" class="modal">
         <div class="modal-content">
             <h2 class="modal-title" id="modalTitle">Resultado de la donación</h2>
             <p class="modal-message" id="modalMessage"></p>
             <button class="modal-btn" id="modalBtn">Aceptar</button>
         </div>
-    </div>
+    </div>-->
 
     <footer>
         <p>© 2025 Donazioak. Todos los derechos reservados.</p>
