@@ -43,7 +43,7 @@ def formularioa_erakutsi(request):
     context = {
         Donation.get_progress_percentage(),
     }
-    return render(request, 'donazioakKudeatu/index.html', context)
+    return render(request, 'donazioakKudeatu/donazioa.html', context)
 
 
 
@@ -60,7 +60,7 @@ def donazioa_bidali_Redsysera(request):
             amount = 0
 
         if amount <= 0:
-            return render(request, 'donazioakKudeatu/index.html', {
+            return render(request, 'donazioakKudeatu/donazioa.html', {
                 'progress_percentage': Donation.get_progress_percentage(),
                 'error_message': "Por favor, introduce una cantidad válida mayor a 0."
             })

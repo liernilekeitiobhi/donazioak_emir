@@ -43,7 +43,7 @@ def formularioa_erakutsi(request):
     context = {
         Donation.get_progress_percentage(),
     }
-    return render(request, 'donazioakKudeatu/index.html', context)
+    return render(request, 'mendiMartxa/mendi-martxa.html', context)
 
 
 
@@ -60,7 +60,7 @@ def donazioa_bidali_Redsysera(request):
             amount = 0
 
         if amount <= 0:
-            return render(request, 'donazioakKudeatu/index.html', {
+            return render(request, 'mendiMartxa/mendi-martxa.html', {
                 'progress_percentage': Donation.get_progress_percentage(),
                 'error_message': "Por favor, introduce una cantidad válida mayor a 0."
             })
@@ -99,7 +99,7 @@ def donazioa_bidali_Redsysera(request):
         )
         
         # Enviar los parámetros a la URL de Redsys redireccionado por un HTML con formulario oculto
-        return render(request, 'donazioakKudeatu/redirect_to_redsys.html', {
+        return render(request, 'mendiMartxa/redirect_to_redsys.html', {
             'redsys_url': settings.REDSYS_URL_TEST if settings.DEBUG else settings.REDSYS_URL,
             'Ds_MerchantParameters': params_base64,
             'Ds_SignatureVersion': 'HMAC_SHA256_V1',
@@ -188,7 +188,7 @@ def ordainketa_zuzena(request):
             logger.warning(f"Acceso a éxito pero estado es {donation.status}")
             return redirect('ordainketa_okerra')
             
-        return render(request, 'donazioakKudeatu/ordainketa-zuzena.html', {
+        return render(request, 'mendiMartxa/ordainketa-zuzena.html', {
             'donation': donation,
         })
     except Donation.DoesNotExist:
@@ -216,7 +216,7 @@ def ordainketa_okerra(request):
         except Donation.DoesNotExist:
             logger.warning(f"Orden no encontrada en error: {order_id}")
     
-    return render(request, 'donazioakKudeatu/errorea-ordainketan.html', context)
+    return render(request, 'mendiMartxa/errorea-ordainketan.html', context)
 
 # =======================================================
 # Para la barra de progreso
