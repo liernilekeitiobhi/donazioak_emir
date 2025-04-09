@@ -39,11 +39,9 @@ logger = logging.getLogger(__name__)
 #============================================
 def formularioa_erakutsi(request):
     # Obtén la campaña activa (puedes ajustar esto según tu lógica)
-    campaign = get_object_or_404(Campaign, is_active=True)
     
     context = {
-        'campaign': campaign,
-        'progress_percentage': campaign.progress_percentage(),
+        Donation.get_progress_percentage(),
     }
     return render(request, 'donazioakKudeatu/index.html', context)
 
