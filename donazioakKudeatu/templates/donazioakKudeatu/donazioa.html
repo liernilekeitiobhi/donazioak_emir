@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donazioak - Haz tu donación</title>
+    <link rel="preload" href="../../static/css/donazioa.css" as="style">
+    <link rel="stylesheet" href="../../static/css/donazioa.css"></head>
+<body>
+    <header>
+        <img src="https://source.unsplash.com/random/1600x900/?charity,help" alt="Imagen de cabecera" class="header-image">
+        <div class="header-overlay">
+            <h1 class="header-title">Haz tu donación</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="intro-section">
+            <h2>Nuestra causa</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere.</p>
+            <p>Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus.</p>
+        </section>
+
+        <section class="donation-form-container">
+            <h2 class="form-title">Realiza tu donación</h2>
+            <form id="donationForm" class="donation-form" method="POST" action="/donate/">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="amount">Cantidad (€)</label>
+                    <label for="donazioa"></label>
+                    <input type="number" id="amount" name="amount" min="1" step="1" placeholder="Ej: 20" required>
+                </div>
+                <button type="submit" class="submit-btn">Donar ahora</button>
+                {% if error_message %}
+                    <div class="error-message">{{ error_message }}</div>
+                {% endif %}
+            </form>
+        </section>
+
+        <section class="progress-container">
+            <h2 class="progress-title">Progreso de la campaña</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <p class="progress-text">
+                Hemos recaudado <span id="currentAmount">0</span>€ 
+                de <span class="progress-goal" id="goalAmount">12,000</span>€
+            </p>
+        </section>
+    </div>
+    <!--
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modalTitle">Resultado de la donación</h2>
+            <p class="modal-message" id="modalMessage"></p>
+            <button class="modal-btn" id="modalBtn">Aceptar</button>
+        </div>
+    </div>-->
+
+    <footer>
+        <p>© 2025 Donazioak. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="../../static/js/donazioa.js"></script>
+</body>
+</html>

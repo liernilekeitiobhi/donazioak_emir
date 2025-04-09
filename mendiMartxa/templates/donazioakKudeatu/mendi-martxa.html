@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donazioak - Haz tu donación</title>
-    <link rel="preload" href="../../static/css/index.css" as="style">
-    <link rel="stylesheet" href="../../static/css/index.css"></head>
+    <link rel="preload" href="../../static/css/donazioa.css" as="style">
+    <link rel="stylesheet" href="../../static/css/donazioa.css"></head>
 <body>
     <header>
         <img src="https://source.unsplash.com/random/1600x900/?charity,help" alt="Imagen de cabecera" class="header-image">
@@ -26,7 +26,8 @@
             <form id="donationForm" class="donation-form" method="POST" action="/donate/">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="amount">Cantidad (€)</label>
+                    <label for="amount">10</label>
+                    <label for="mendi-martxa"></label>
                     <input type="number" id="amount" name="amount" min="1" step="1" placeholder="Ej: 20" required>
                 </div>
                 <button type="submit" class="submit-btn">Donar ahora</button>
@@ -60,6 +61,6 @@
         <p>© 2025 Donazioak. Todos los derechos reservados.</p>
     </footer>
 
-    <script src="../../static/js/index.js"></script>
+    <script src="../../static/js/donazioa.js"></script>
 </body>
 </html>
